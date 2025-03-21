@@ -1,0 +1,767 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLEX FORGE | strenght redefined</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <style>
+        /* Basic reset for margin and padding */
+ 
+        body {
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: #ffffff;
+            color: #333;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+
+}
+        
+
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+            }
+            .navbar-left {
+                flex-direction: column;
+                align-items: center;
+            }
+            .navbar-center {
+                flex-direction: column;
+                align-items: center;
+            }
+            .navbar-right {
+                flex-direction: column;
+                align-items: center;
+            }
+            .second-navbar {
+                display: none;
+            }
+        }
+
+
+
+
+/* Body and general layout */
+
+
+/* Product Listing Section */
+.product-listing {
+    padding: 40px 20px;
+    text-align: center;
+    background-color: #ffffff;
+    /* background-image: url("{% static 'images/amazon-g.jpg' %}"); */
+}
+
+.product-listing h2 {
+    margin-bottom: 30px;
+    font-size: 2em;
+    color: #232f3e;
+    /* background-image: linear-gradient(to right, #232f3e, #f1a500); */
+}
+
+.products {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.product {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 250px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.product:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.product img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+}
+
+.product img:hover {
+    transform: scale(1.1);
+}
+
+.product h3 {
+    margin: 20px 0;
+    font-size: 1.2em;
+    color: #232f3e;
+}
+
+.product .price {
+    font-size: 1.4em;
+    color: #b12704;
+    margin-bottom: 20px;
+}
+
+.buy-btn {
+    padding: 10px 20px;
+    background-color: #febd69;
+    color: #232f3e;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+.buy-btn:hover {
+    background-color: #f1a500;
+}
+
+@media (max-width: 768px) {
+    .products {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .product {
+        width: 80%;
+        margin-bottom: 20px;
+    }
+}
+
+
+
+
+
+.container-fluid {
+    background-color: #e9e9e9;
+}
+
+/* General Footer Styling */
+footer {
+    
+  background-color: #ffffff; /* Dark blue background for Amazon-like theme */
+  color: #272727; /* White text */
+  padding: 40px 20px;
+  text-align: left;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+/* Footer Container to hold columns */
+.footer-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+/* Footer Columns Styling */
+.footer-column {
+  width: 22%;
+  margin-bottom: 20px;
+}
+
+.footer-column h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.footer-column ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-column ul li {
+  margin-bottom: 8px;
+}
+
+.footer-column ul li a {
+  color: #fff9f9;
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.3s ease;
+}
+
+.footer-column ul li a:hover {
+  color: #ff9900; /* Amazon orange color for hover effect */
+}
+
+/* Social Media Icons Styling */
+.footer-column ul li a.icon {
+  font-size: 20px;
+  margin-right: 10px;
+}
+
+/* Bottom Section Styling */
+.footer-bottom {
+  text-align: center;
+  padding: 20px 0;
+  border-top: 1px solid #444;
+  font-size: 14px;
+}
+
+.footer-bottom p {
+  margin: 0;
+  color: #ffffff;
+}
+
+
+/* Mobile Responsive Design */
+@media (max-width: 768px) {
+  .footer-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .footer-column {
+    width: 100%;
+    text-align: center;
+  }
+
+  .footer-column h3 {
+    font-size: 16px;
+  }
+
+  .footer-column ul li {
+    font-size: 13px;
+  }
+}
+
+.navbar a:hover {
+    color: #ff9900; /* Amazon orange color for hover effect */
+}
+
+        .second-navbar {
+            background-color: #dbd6d6;
+            padding: 10px 0;
+            
+        }
+
+        .second-nav-links {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .second-nav-links > * {
+            margin: 0 15px;
+        }
+
+        .second-nav-links a {
+            color: rgb(61, 61, 61);
+            text-decoration: none;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            
+            
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+            }
+
+            .navbar-left {
+                margin-bottom: 10px;
+            }
+
+            .navbar-center {
+                margin-bottom: 10px;
+            }
+
+            .navbar-right {
+                margin-bottom: 10px;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .search-btn {
+                width: 100%;
+            }
+
+            .second-navbar {
+                display: none;
+            }
+        }
+    
+   
+
+
+
+
+    .hero-section {
+        position: relative;
+        width: 100%;
+        height: 100vh;
+        background: url("{% static 'images/at.jpg' %}") no-repeat center center/cover;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+    .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+    }
+    .content {
+        position: relative;
+        z-index: 2;
+        max-width: 80%;
+        color: #ccc;
+    }
+    .content h1 {
+        font-size: 3rem;
+        font-weight: bold;
+    }
+    .btn-learn {
+        background: #000;
+        color: #fff;
+        border: 2px solid #fff;
+        padding: 10px 20px;
+        text-transform: uppercase;
+        font-weight: bold;
+        margin-top: 20px;
+    }
+    .btn-learn:hover {
+        background: #fff;
+        color: #000;
+    }
+    @media (max-width: 768px) {
+        .content h1 {
+            font-size: 2rem;
+        }
+    }
+
+
+    
+
+
+
+          
+    .mission-section {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 40px;
+    }
+    .image-container {
+        position: relative;
+    }
+    .image-container img {
+        width: 100%;
+        max-width: 257px;
+        height: 254px;
+        object-fit: cover;
+        display: block;
+        border-radius: 50%;
+        margin-left: 30%;
+
+    }
+    .text-container {
+        color: black;
+        padding-left: 40px;
+    }
+    @media (max-width: 768px) {
+        .mission-section {
+            flex-direction: column;
+            text-align: center;
+        }
+        .text-container {
+            padding-left: 0;
+            margin-top: 20px;
+        }
+    }
+
+
+    
+            .header-purple {
+                background: linear-gradient(135deg, #000000 0%, #000000 100%);
+                color: white;
+                padding: 50px 0;
+                position: relative;
+                overflow: hidden;
+            }
+            .product-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            }
+            .product-image {
+                height: 250px;
+                object-fit: contain;
+                padding: 20px;
+                background-color: #f5f7fa;
+            }
+            .sidebar-heading {
+                background-color: #000;
+                color: white;
+                padding: 10px 15px;
+                font-weight: bold;
+            }
+        /* Card Hover Effect */
+        .card {
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+    
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+    
+        /* Image Hover Effect */
+        .card img {
+            transition: transform 0.3s ease-in-out;
+        }
+    
+        .card:hover img {
+            transform: scale(1.1);
+        }
+        
+ 
+
+
+
+        /* Premium Card Design */
+        .card {
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    
+        /* Card Hover Effect */
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+    
+        /* Image Styling */
+        .card img {
+            transition: transform 0.3s ease-in-out;
+            border-radius: 8px;
+        }
+    
+        .card:hover img {
+            transform: scale(1.08);
+        }
+    
+        /* Title Styling */
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+    
+        /* Price & Discount Styling */
+        .price {
+            font-size: 20px;
+            font-weight: 700;
+            color: #e63946;
+        }
+    
+        .original-price {
+            font-size: 14px;
+            color: #777;
+        }
+    
+        /* Button Styling */
+        .btn-premium {
+            background: linear-gradient(135deg, #ff7176, #ffb8a4);
+            color: white;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 8px 12px;
+            transition: all 0.3s ease-in-out;
+        }
+    
+        .btn-premium:hover {
+            background: linear-gradient(135deg, #fcbcab, #f38488);
+            transform: scale(1.05);
+        }
+    
+        /* Card Container */
+        .product-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+    
+
+        .social-section {
+            background-color: #f5f5f5;
+            padding: 3rem ;
+
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .social-icon {
+            font-size: 1.5rem;
+            color: #333;
+            transition: color 0.3s ease;
+        }
+
+        .social-icon:hover {
+            color: #666;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .social-heading {
+                font-size: 1.25rem;
+            }
+            
+            .social-icons {
+                gap: 1.5rem;
+            }
+            
+            .social-icon {
+                font-size: 1.25rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .social-heading {
+                font-size: 1rem;
+            }
+            
+            .social-icons {
+                gap: 1rem;
+            }
+        }
+
+</style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+
+    <header>
+        
+        
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container">
+                <a class="navbar-brand" href="{% url 'home' %}">FLEX FORGE</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav mx-auto text-center">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{% url 'product_buy' %}">PRODUCTS</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'wheretobuy' %}">WHERE TO BUY</a>
+                        </li>
+                      
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">MORE</a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="#">Blog</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'help' %}">Contact</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+    
+                    <!-- Right section with Search Bar, User, Logout, and Cart -->
+                    <div class="d-flex align-items-center">
+                        <form class="d-flex me-3">
+                            {% csrf_token %}
+                            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                            <button class="btn btn-outline-dark" type="submit">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </button>
+                        </form>
+                        
+                        <a href="{% url 'account' %}" class="nav-link me-2"><i class="fa-solid fa-user me-2"></i></a>
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'userlogout' %}" class="nav-link me-2"><i class="fa-solid fa-right-from-bracket me-2"></i></a>
+                        <a href="{% url 'wishlist' %}"><i class="fa-solid fa-heart me-2"></i></a>
+
+                        <a href="{% url 'cart' %}" class="nav-link">
+                            <img src="{% static 'images/cart.png' %}" alt="Cart" width="30" height="24" class="me-2">
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </nav>
+        
+        <nav class="second-navbar">
+            <ul class="second-nav-links" style="font-family: 'Roboto', sans-serif; font-size: 16px; font-weight: 500;">
+             
+                <li>  <div class="container">
+                    <a href="{% url 'signup' %}" class="newsletter-link">SIGN UP FOR OUR NEWSLETTER</a>
+                </div>
+            </li>
+            </ul>
+        </nav>
+    </header>
+  
+
+<div class="hero-section">
+    <div class="overlay"></div>
+    <div class="content">
+        <h1>SUPERIOR SCIENCE.<br>SUPERIOR RESULTS.</h1>
+        <a href="{% url 'product_buy' %}"><button class="btn btn-learn">Learn More</button></a>
+    </div>
+</div>
+
+
+
+
+<div class="container text-center my-5">
+    <h2 class="fw-bold">FEATURED PRODUCTS</h2>
+    <div class="row mt-4">
+        {% for i in product %}
+        <div class="col-md-3">
+            <div class="card p-3 shadow-sm">
+                <img src="{{ i.image.url }}" class="card-img-top" alt="{{ i.name }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ i.name }}</h5>
+                    <p class="text-muted">{{ i.category }}</p>
+                    <a href="{% url 'product_detail' i.id %}" class="btn btn-primary">Learn More</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <h3 class="mt-5">SHOP BY CATEGORY</h3>
+    <div class="d-flex justify-content-center gap-2 mt-3">
+        <button class="btn btn-outline-dark">PROTEIN</button>
+        <button class="btn btn-outline-dark">WEIGHT LOSS</button>
+        <button class="btn btn-outline-dark">PRE-WORKOUT</button>
+        <button class="btn btn-outline-dark">POST-WORKOUT</button>
+        <button class="btn btn-outline-dark">MUSCLEBUILDING</button>
+    </div>
+</div>
+<div class="container-1">
+    <div class="row mission-section">
+        <div class="col-md-6 image-container">
+            <img src="{% static 'images/stlogo.webp' %}" alt="FLEX FORGE ">
+        </div>
+        <div class="col-md-6 text-container">
+            <h2 class="fw-bold">BRAND MISSION</h2>
+            <p>
+                <strong>Flex forge</strong> was born out of an obsession to redefine the limits of science and human potential. With our commitment to research, development and innovation, we inspire active people, fitness enthusiasts and elite athletes to grow stronger together. For more than two decades, we’ve fuelled those who raise the bar—not in pursuit of a personal best but a better way for everyone. Like you, we’re in it to build more than muscle.</p>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+     
+    <div class="social-section">
+        <div class="container">
+            <div class="row text-center">
+                <div class="col-12">
+                    <h2 class="social-heading">FOLLOW US ON SOCIAL @MUSCLETECH</h2>
+                    <div class="social-icons">
+                        <a href="https://www.instagram.com/muscletech/" class="social-icon">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="https://www.tiktok.com/@muscletech" class="social-icon">
+                            <i class="fab fa-tiktok"></i>
+                        </a>
+                        <a href="https://www.facebook.com/muscletech" class="social-icon">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="https://twitter.com/muscletech" class="social-icon">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="https://www.youtube.com/muscletech" class="social-icon">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+<footer class="footer mt-auto py-3" style="background-color: #f8f9fa; color: #343a40;">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3 col-sm-6">
+                <h3 style="color: #343a40;">About Us</h3>
+                <ul class="list-unstyled">
+                    <li><a href="#" style="color: #343a40;">About FLEX FORGE</a></li>
+                    <li><a href="#" style="color: #343a40;">Careers</a></li>
+                    <li><a href="#" style="color: #343a40;">Press Releases</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <h3 style="color: #343a40;">Customer Service</h3>
+                <ul class="list-unstyled">
+                    <li><a href="{% url 'help' %}" style="color: #343a40;">Contact Us</a></li>
+                    <li><a href="{% url 'help' %}" style="color: #343a40;">Help</a></li>
+                    <li><a href="#" style="color: #343a40;">Returns & Refunds</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <h3 style="color: #343a40;">Shop</h3>
+                <ul class="list-unstyled">
+                    <li><a href="#" style="color: #343a40;">Protein</a></li>
+                    <li><a href="#" style="color: #343a40;">Creatine</a></li>
+                    <li><a href="{% url 'home' %}" style="color: #343a40;">Home</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <h3 style="color: #343a40;">Follow Us</h3>
+                <ul class="list-unstyled" style="font-size: 2rem;">
+                    <li><a href="#"><i class="fa-brands fa-facebook" style="color: #343a40;"></i> </a></li>
+                    <li><a href="#"><i class="fa-brands fa-instagram" style="color: #343a40;"></i></a></li>
+                    <li><a href="#"><i class="fa-brands fa-twitter" style="color: #343a40;"></i></a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p class="text-center">&copy; 2025 FLEX FORGE, Inc. All Rights Reserved.</p>
+        </div>
+    </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+</body>
+</html>
+
+
+

@@ -7,7 +7,7 @@ from .models import *
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.contrib.auth.models import User
-
+from .forms import *
 
 
 def home(request):
@@ -65,10 +65,6 @@ def userlogout(request):
     return render(request, 'base.html')
 
 
-def admin(request):
-    return render(request, 'admin.html')
-
-
 
 
 
@@ -96,99 +92,77 @@ def buy_now(request):
 
 
 
+##########################admin#####################
 
-
-#-------------------seller__-------------------------
-
-# def slogout(request):
-#     request.session.flush()
-#     return render(request, 'base.html')  # A custom template after logout
-
-
-# @login_required(login_url='sellerin')
-# def Add_product(request):
-#     return render(request, 'seller/selleradd.html')
-
-
-# def selleradd(request):
-#     if request.method == 'POST':
-#         title = request.POST.get('title')
-#         price = request.POST.get('price')
-#         category = request.POST.get('category')
-#         image = request.FILES.get('image')
-#         description = request.POST.get('description')
-
-#         # Check if all required fields are provided
-#         if not title or not price or not category or not image or not description:
-#             messages.error(request, "All fields are required!")
-#             return render(request, 'seller/selleradd.html')
-
-#         # Create and save product object
-#         product = Product(
-#             title=title,
-#             price=price,
-#             category=category,
-#             image=image,
-#             description=description
-#         )
-#         product.save()
-
-#         # Success message
-#         messages.success(request, "Product added successfully!")
-#         return redirect('sellerview')
-    
-#     # If GET request, render the page with empty form
-#     return render(request, 'seller/selleradd.html')
-
-
-# def sellerview(request):
-#     products = Product.objects.all()
-#     return render(request, 'seller/seller.html', {'products': products})
+def admin(request):
+    context = {
+        'products': Product.objects.all(),
+        'orders': Order.objects.all(),
+        'users': User.objects.all(),
+        'categories': Category.objects.all(),
+        'addresses': Address.objects.all(),
+        'wishlist': Wishlist.objects.all(),
+        'products_count': Product.objects.count(),
+        'orders_count': Order.objects.count(),
+        'users_count': User.objects.count(),
+        'categories_count': Category.objects.count(),
+    }
+    return render(request, 'admin/admin.html', context)
 
 
 
-# def edit_product(request, id):
-#     product = Product.objects.get(id=id)
-#     if request.method == 'POST':
-#         title = request.POST.get('title')
-#         price = request.POST.get('price')
-#         category = request.POST.get('category')
-#         image = request.FILES.get('image')
-#         description = request.POST.get('description')
 
 
-#         # Check if all required fields are provided
-#         if not title or not price or not category or not description:
-#             messages.error(request, "All fields are required!")
-#             return render(request, 'seller/edit.html', {'product': product})
+def add_product(request):
+    if request.method == 'POST':
+        form = ProductForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('admin')
+    else:
+        form = ProductForm()
+    return render(request, 'admin/add_product.html', {'form': form})
 
-#         # Update and save product object
-#         product.title = title
-#         product.price = price
-#         product.category = category
-#         if image:
-#             product.image = image
-#         product.description = description
-#         product.save()
+def edit_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    if request.method == 'POST':
+        form = ProductForm(request.POST, instance=product)
+        if form.is_valid():
+            form.save()
+            return redirect('admin')
+    else:
+        form = ProductForm(instance=product)
+    return render(request, 'admin/edit_product.html', {'form': form})
 
-#         # Success message
-#         messages.success(request, "Product updated successfully!")
-#         return render(request, 'seller/seller.html')
-    
-#     # If GET request, render the page with empty form
-#     return render(request, 'seller/edit.html', {'product': product})
+def delete_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    product.delete()
+    return redirect('admin')
 
-# def delete_view(request, id):
-#     product = Product.objects.filter(pk=id).first()  # Get product by ID (or None if not found)
-#     if product:
-#         product.delete()  # Delete the product
-#         messages.success(request, "Product deleted successfully!")  # Optional success message
-#     return redirect('sellerview')
+# Order Views
+def cancel_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    order.delete()
+    return redirect('admin')
 
-# #------------------------------------------------------------------------------#
+# User Views
+def delete_user(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    user.delete()
+    return redirect('admin')
 
+# Category Views
+def add_category(request):
+    if request.method == 'POST':
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('admin')
+    else:
+        form = CategoryForm()
+    return render(request, 'admin/add_category.html', {'form': form})
 
-
+################################################################################
 
 def search(request):
     if request.method == 'POST':
@@ -196,7 +170,7 @@ def search(request):
         category = request.POST.get('category', '')  # Get the selected category (if any)
         
         # Filter products based on the search term and category
-        results = Products.objects.all()
+        results = Product.objects.all()
         
         if searched:
             results = results.filter(name__icontains=searched)
@@ -218,7 +192,6 @@ def product_display(request):
 #_---------------------------cart-------------------------------#
 
 # Add to cart functionality
-@login_required
 def add_to_cart(request, product_id):
     if request.user.is_authenticated:
         try:
@@ -242,7 +215,6 @@ def add_to_cart(request, product_id):
         return redirect('signin')
 
 # View cart (standalone template)
-@login_required
 def Cart_view(request):
     cart_items = Cart.objects.filter(user=request.user)
     total_price = sum(item.product.price * item.quantity for item in cart_items)
@@ -251,7 +223,6 @@ def Cart_view(request):
 
 
 
-@require_POST
 def update_cart(request, cart_item_id):
     cart_item = get_object_or_404(Cart, id=cart_item_id, user=request.user)
     action = request.POST.get('action')
@@ -270,7 +241,6 @@ def update_cart(request, cart_item_id):
     return redirect('cart')
 
 # Remove from cart
-@login_required
 def remove_from_cart(request, cart_item_id):
     cart_item = get_object_or_404(Cart, id=cart_item_id, user=request.user)
     cart_item.delete()
@@ -300,30 +270,31 @@ def product_detail(request, pk):
 
 def wishlist(request):
     return render(request, 'user/wishlist.html') 
+
+
 def addtowishlist(request, product_id):
+    # Check if user is authenticated
+    if not request.user.is_authenticated:
+        return redirect(f'/login/?next={request.path}')
+    
     product = get_object_or_404(Product, id=product_id)
     
-    # Check if product is already in wishlist
     wishlist_item, created = Wishlist.objects.get_or_create(
         user=request.user,
         product=product
     )
     
-    # For AJAX requests
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse({
             'success': True,
             'message': f'{product.title} added to your wishlist'
         })
     
-    return redirect('product_buy')
-
-@login_required
+    return redirect('home') 
 def remove_from_wishlist(request, product_id):
     Wishlist.objects.filter(user=request.user, product_id=product_id).delete()
     return redirect('wishlist')
 
-@login_required
 def view_wishlist(request):
     wishlist_items = Wishlist.objects.filter(user=request.user).select_related('product')
     

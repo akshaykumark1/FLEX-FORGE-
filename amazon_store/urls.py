@@ -13,6 +13,7 @@ urlpatterns = [
     path('help',views.help,name='help'),
     path('log-out',views.userlogout,name='userlogout'),
     path('cart',views.Cart_view, name='cart'),
+    path('search',views.search,name='search'),
 
 
     path('admin',views.admin,name='admin'),
@@ -31,7 +32,8 @@ urlpatterns = [
     # path('product')
 
 
-
+#######admin#####
+    path('admin', views.admin, name='admin'),
 
 
 

@@ -1,4 +1,4 @@
-{% load stat %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -121,7 +121,7 @@
                         <img src="{{ item.product.image1.url }}" alt="{{ item.product.title }}" class="wishlist-item-image me-3">
                         <div>
                             <h5>{{ item.product.title }}</h5>
-                            <p class="mb-1">${{ item.product.price }}</p>
+                            <p class="mb-1">₹{{ item.product.price }}</p>
                             <p class="mb-1">{{ item.product.category }}</p>
                         </div>
                     </div>

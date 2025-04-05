@@ -8,15 +8,17 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('accounts/login/', views.signin, name='signin'),  # Ensure this line is here
     path('cart/', views.Cart_view, name='cart'),
+    path('remove_from_cart/<id>',views.remove_from_cart,name='remove_from_cart'),
     path('signup',views.signup,name='signup'),
     path('orders',views.orders,name='orders'),
     path('help',views.help,name='help'),
     path('log-out',views.userlogout,name='userlogout'),
     path('cart',views.Cart_view, name='cart'),
-    path('search',views.search,name='search'),
+    path('search',views.search1,name='search'),
 
 
     path('admin',views.admin,name='admin'),
+    path('add_product',views.add_product,name='add_product'),
 
 
 
@@ -46,6 +48,7 @@ urlpatterns = [
     path('wishlist',views.wishlist,name='wishlist'),
     path('addtowishlist/<int:product_id>/', views.addtowishlist, name='addtowishlist'),
     path('remove-from-wishlist/<int:product_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
+    
 
 
 

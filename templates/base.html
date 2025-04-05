@@ -598,12 +598,12 @@ footer {
     
                     <!-- Right section with Search Bar, User, Logout, and Cart -->
                     <div class="d-flex align-items-center">
-                        <form class="d-flex me-3">
+                        <form class="d-flex" role="search" action="{% url 'search' %}" method="POST">
                             {% csrf_token %}
-                            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                            <button class="btn btn-outline-dark" type="submit">
-                                <i class="fa-solid fa-magnifying-glass"></i>
-                            </button>
+                           
+                            <input id="search" 
+                                class="form-control me-2" type="text" placeholder="Search For Product, Brand and More"
+                                aria-label="Search" name="searched">
                         </form>
                         
                         <a href="{% url 'account' %}" class="nav-link me-2"><i class="fa-solid fa-user me-2"></i></a>

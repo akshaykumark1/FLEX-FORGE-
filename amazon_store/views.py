@@ -164,7 +164,7 @@ def add_category(request):
 
 ################################################################################
 
-def search(request):
+def search1(request):
     if request.method == 'POST':
         searched = request.POST.get('searched', '').strip()  # Get the search term
         category = request.POST.get('category', '')  # Get the selected category (if any)
@@ -173,7 +173,7 @@ def search(request):
         results = Product.objects.all()
         
         if searched:
-            results = results.filter(name__icontains=searched)
+            results = results.filter(title__icontains=searched)
         
         if category:
             # Dynamically filter based on the category field
@@ -241,8 +241,8 @@ def update_cart(request, cart_item_id):
     return redirect('cart')
 
 # Remove from cart
-def remove_from_cart(request, cart_item_id):
-    cart_item = get_object_or_404(Cart, id=cart_item_id, user=request.user)
+def remove_from_cart(request, id):
+    cart_item = get_object_or_404(Cart, id=id, user=request.user)
     cart_item.delete()
     return redirect('cart')
 
@@ -269,7 +269,9 @@ def product_detail(request, pk):
 #----------------------------wishlist------------------------------------------------------#
 
 def wishlist(request):
-    return render(request, 'user/wishlist.html') 
+    
+    wishlist_items=Wishlist.objects.filter(user=request.user)
+    return render(request, 'user/wishlist.html',{'wishlist_items':wishlist_items}) 
 
 
 def addtowishlist(request, product_id):

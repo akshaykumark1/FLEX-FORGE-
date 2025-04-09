@@ -20,9 +20,10 @@ urlpatterns = [
 
 
 
+
     path('product_buy',views.product_buy,name='product_buy'),   
     path('wheretobuy',views.wheretobuy,name='wheretobuy'),
-    path('buy-now', views.buy_now, name='buy_now'),
+    path('buy-now<int:product_id>/', views.buy_now, name='buy_now'),
     # Change this line
     path('add-to-cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
     path('product_details/<int:pk>/',views.product_detail, name='product_detail'),   

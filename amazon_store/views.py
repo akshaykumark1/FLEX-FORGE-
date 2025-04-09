@@ -87,7 +87,7 @@ def product_buy(request):
 def wheretobuy(request):
     return render(request,'user/wheretobuy.html')
 
-def buy_now(request):
+def buy_now(request,product_id):    
     return render(request,'buy_now.html')
 
 

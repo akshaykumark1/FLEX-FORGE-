@@ -47,6 +47,9 @@ urlpatterns = [
     path('addtowishlist/<int:product_id>/', views.addtowishlist, name='addtowishlist'),
     path('remove-from-wishlist/<int:product_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
     
+# payments
+    path('index',views.index,name='index'),
+    path('order_ payment',views.order_payment,name='order_payment')
 
 
 

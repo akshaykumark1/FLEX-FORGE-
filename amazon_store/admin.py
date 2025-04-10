@@ -21,11 +21,8 @@ class CartAdmin(admin.ModelAdmin):
     list_filter = ('user',)
     search_fields = ('user__username', 'product__title')
 
-@admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('user', 'product', 'quantity')
-    list_filter = ('user',)
-    search_fields = ('user__username', 'product__title')
+    list_display = ['user', 'product', 'quantity']
 
 @admin.register(Address)
 class AddressAdmin(admin.ModelAdmin):

@@ -144,3 +144,9 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'kumarakshay70667@gmail.com'
 EMAIL_HOST_PASSWORD = 'wukd pnuy gaax vwkw'
 DEFAULT_FROM_EMAIL = 'kumarakshay70667@gmail.com'
+
+
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+RAZORPAY_KEY_ID = 'rzp_test_F86cHEEdrwUIuQ'
+RAZORPAY_KEY_SECRET = 'Ao5zXbuUHtHqvSQpX516Wy4R'

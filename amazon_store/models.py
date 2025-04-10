@@ -66,7 +66,6 @@ class Order(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
     
-    name = CharField(_("Customer Name"), max_length=254, blank=False, null=False)
     amount = models.FloatField(_("Amount"), null=False, blank=False)
     status = CharField(
         _("Payment Status"),
@@ -75,9 +74,9 @@ class Order(models.Model):
         blank=False,
         null=False,
     )
-    provider_order_id = models.CharField(_("Order ID"), max_length=40)
-    payment_id = models.CharField(_("Payment ID"), max_length=36)
-    signature_id = models.CharField(_("Signature ID"), max_length=128)
+    provider_order_id = models.CharField(_("Order ID"), max_length=40,null=True)
+    payment_id = models.CharField(_("Payment ID"), max_length=36,null=True)
+    signature_id = models.CharField(_("Signature ID"), max_length=128,null=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.product.title} ({self.quantity})"

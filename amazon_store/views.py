@@ -11,7 +11,7 @@ from .forms import *
 import razorpay
 import json
 from django.views.decorators.csrf import csrf_exempt
-
+from django.conf import settings
 
 
 
@@ -329,10 +329,12 @@ def security(request):
 def index(request):
     return render(request, "index.html")
 
-def order_payment(request):
-    if request.method == "POST":
-        name = request.POST.get("name")
-        amount = request.POST.get("amount")
+def order_payment(request,id):
+        user=request.user
+        user_data = User.objects.get(username=user)
+        # print(user)
+        product = Product.objects.get(pk=id)
+        amount = product.price
 
         client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
         razorpay_order = client.order.create(
@@ -340,14 +342,23 @@ def order_payment(request):
         )
 
         order_id = razorpay_order['id']
+
+        # cart=Cart.objects.filter(user=user_data)
+        # for i in cart:        
+        #     order = Order.objects.create(
+        #         user=user_data, amount=amount, provider_order_id=order_id,product=product,quantity=1
+        #     )
+        #     order.save()
+
+
         order = Order.objects.create(
-            name=name, amount=amount, provider_order_id=order_id
+            user=user_data, amount=amount, provider_order_id=order_id,product=product,quantity=1
         )
         order.save()
 
         return render(
             request,
-            "index.html",
+            "user/payment.html",
             {
                 "callback_url": "http://" + "127.0.0.1:8000" + "razorpay/callback",
                 "razorpay_key": settings.RAZORPAY_KEY_ID,
@@ -356,7 +367,6 @@ def order_payment(request):
             },
         )
 
-    return render(request, "index.html")
 
 
 
@@ -378,7 +388,7 @@ def callback(request):
         order.signature_id = signature_id
         order.save()
 
-        if not verify_signature(request.POST):
+        if verify_signature(request.POST):
             order.status = PaymentStatus.SUCCESS
             order.save()
             return render(request, "callback.html", context={"status": order.status}) 

@@ -49,7 +49,7 @@ urlpatterns = [
     
 # payments
     path('index',views.index,name='index'),
-    path('order_ payment',views.order_payment,name='order_payment')
+    path('order_payment/<id>',views.order_payment,name='order_payment')
 
 
 

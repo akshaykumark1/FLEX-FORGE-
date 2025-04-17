@@ -96,11 +96,20 @@
                                 </button>
                             </form>
                             
-                            <a href="{% url 'account' %}" class="nav-link me-2"><i class="fa-solid fa-user"></i></a>
-                            <a href="{% url 'userlogout' %}" class="nav-link me-2"><i class="fa-solid fa-right-from-bracket"></i></a>
-                            <a href="{% url 'cart' %}" class="nav-link">
-                                <img src="{% static 'images/cart.png' %}" alt="Cart" width="30" height="24">
+                            {% if user.is_authenticated %}
+                            <!-- Show user/account/logout/cart links -->
+                            <a href="{% url 'account' %}" class="nav-link me-2">
+                              <i class="fa-solid fa-user"></i>
                             </a>
+                            <a href="{% url 'userlogout' %}" class="nav-link me-2">
+                              <i class="fa-solid fa-right-from-bracket"></i>
+                            </a>
+                            <a href="{% url 'cart' %}" class="nav-link">
+                              <img src="{% static 'images/cart.png' %}" alt="Cart" width="30" height="24">
+                            </a>
+                        
+                          {% endif %}
+                          
                         </div>
                     </div>
                 </div>

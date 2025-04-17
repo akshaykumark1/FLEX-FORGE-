@@ -12,7 +12,7 @@ urlpatterns = [
     path('signup',views.signup,name='signup'),
     path('orders',views.orders,name='orders'),
     path('help',views.help,name='help'),
-    path('log-out',views.userlogout,name='userlogout'),
+    path('logout',views.userlogout,name='userlogout'),
     path('search',views.search1,name='search'),
 
 
@@ -33,25 +33,37 @@ urlpatterns = [
 
 #######admin#####
     path('admin', views.admin, name='admin'),
+    path('order',views.order,name='order'),
+    path('users',views.users,name='users'),
 
     path('add_product',views.add_product,name='add_product'),
-
+    path('edit_product/<int:product_id>/',views.edit_product,name='edit_product'),
+    path('delete_product/<int:product_id>/', views.delete_product, name='delete_product'),
 
 
     
     path('address',views.address,name='address'),
-    path('security',views.security,name='security'),
 
 #____________________wishlist___________________________#
     path('wishlist',views.wishlist,name='wishlist'),
     path('addtowishlist/<int:product_id>/', views.addtowishlist, name='addtowishlist'),
-    path('remove-from-wishlist/<int:product_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
+    path('remove-from-wishlist/<int:product_id>/',views.remove_from_wishlist, name='remove_from_wishlist'),
     
 # payments
     path('index',views.index,name='index'),
-    path('order_payment/<id>',views.order_payment,name='order_payment')
+    path('order_payment/<id>',views.order_payment,name='order_payment'),
+    path('callback/<id>',views.callback,name='callback'),
+
+    path('order_payment2',views.order_payment2,name='order_payment2'),
+    path('callback2',views.callback2,name='callback2'),
+    path('add_address/<id>/', views.add_address, name='add_address'),
+
+    path('checkout/', views.checkout_view, name='checkout'),
+    path('order_summary',views.order_summary,name='order_summary'),
 
 
+
+    path('update-quantity/<int:item_id>/', views.update_quantity, name='update_quantity'),
 
 
 

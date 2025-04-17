@@ -147,6 +147,5 @@ DEFAULT_FROM_EMAIL = 'kumarakshay70667@gmail.com'
 
 
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-RAZORPAY_KEY_ID = 'rzp_test_F86cHEEdrwUIuQ'
-RAZORPAY_KEY_SECRET = 'Ao5zXbuUHtHqvSQpX516Wy4R'
+RAZORPAY_KEY_ID = 'rzp_test_sT2vhpWmIeMf4D'
+RAZORPAY_KEY_SECRET = '3bKgE5hNWzzugkb0cPAIBJgN'

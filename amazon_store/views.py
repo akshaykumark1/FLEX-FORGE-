@@ -99,18 +99,24 @@ def buy_now(request,product_id):
 
 ##########################admin#####################
 
+def order(request):
+    orders = Order.objects.all()
+    return render(request, 'admin/orders.html', {'orders': orders})
+
+def users(request):
+    users = User.objects.all()
+    return render(request, 'admin/users.html', {'users': users})
+
+def address(request):
+    addresses = Address.objects.all()
+    return render(request, 'admin/address.html', {'addresses': addresses})
+
+
 def admin(request):
     context = {
-        'products': Product.objects.all(),
-        'orders': Order.objects.all(),
-        'users': User.objects.all(),
-        'categories': Category.objects.all(),
-        'addresses': Address.objects.all(),
-        'wishlist': Wishlist.objects.all(),
-        'products_count': Product.objects.count(),
-        'orders_count': Order.objects.count(),
-        'users_count': User.objects.count(),
-        'categories_count': Category.objects.count(),
+        'products': Product.objects.all()[::-1],
+        'orders': Order.objects.all()[::-1],
+
     }
     return render(request, 'admin/admin.html', context)
 
@@ -119,25 +125,70 @@ def admin(request):
 
 
 def add_product(request):
-    if request.method == 'POST':
-        form = ProductForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('admin')
-    else:
-        form = ProductForm()
-    return render(request, 'admin/add_product.html', {'form': form})
+    if request.method == "POST":
+        title = request.POST.get("title")
+        description = request.POST.get("description")
+        price = request.POST.get("price")
+
+        image1 = request.FILES.get("image1")
+        image2 = request.FILES.get("image2")
+        image3 = request.FILES.get("image3")
+        image4 = request.FILES.get("image4")
+        image5 = request.FILES.get("image5")
+
+        product = Product.objects.create(
+            title=title,
+            description=description,
+            price=price,
+            image1=image1,
+            image2=image2,
+            image3=image3,
+            image4=image4,
+            image5=image5,
+        )
+        product.save()
+        return redirect("admin")
+    return render(request, 'admin/add_product.html')
 
 def edit_product(request, product_id):
     product = get_object_or_404(Product, id=product_id)
+    categories = Category.objects.all()
+
+    # Prepare the image fields list for rendering
+    image_fields = [
+        ('image1', product.image1),
+        ('image2', product.image2),
+        ('image3', product.image3),
+        ('image4', product.image4),
+        ('image5', product.image5),
+    ]
+
     if request.method == 'POST':
-        form = ProductForm(request.POST, instance=product)
-        if form.is_valid():
-            form.save()
-            return redirect('admin')
-    else:
-        form = ProductForm(instance=product)
-    return render(request, 'admin/edit_product.html', {'form': form})
+        # Process form data
+        product.title = request.POST.get('title')
+        product.description = request.POST.get('description')
+        product.price = request.POST.get('price')
+        product.category_id = request.POST.get('category')
+        product.original_price = request.POST.get('original_price')
+        product.discount = request.POST.get('discount')
+        product.delivery_date = request.POST.get('delivery_date')
+
+        # Update image fields if new files are uploaded
+        for i in range(1, 6):
+            image_field = f'image{i}'
+            uploaded_image = request.FILES.get(image_field)
+            if uploaded_image:
+                setattr(product, image_field, uploaded_image)
+
+        product.save()  # Save the updated product
+
+        return redirect('admin')  
+
+    return render(request, 'admin/edit_product.html', {
+        'product': product,
+        'categories': categories,
+        'image_fields': image_fields  # Pass image fields to the template
+    })
 
 def delete_product(request, product_id):
     product = get_object_or_404(Product, id=product_id)
@@ -195,6 +246,184 @@ def product_display(request):
     
     return render(request, 'user/product_buy.html', {'products': products})
 #_---------------------------cart-------------------------------#
+def checkout_view(request):
+    user = request.user
+    cart_items = Cart.objects.filter(user=user)
+    total_price = sum(item.price for item in cart_items)
+
+    if request.method == 'POST':
+        address = request.POST.get('address')
+        city = request.POST.get('city')
+        state = request.POST.get('state')
+        zip_code = request.POST.get('zip_code')
+        country = request.POST.get('country')
+
+        # Save address
+        Address.objects.create(
+            user=user,
+            address=address,
+            city=city,
+            state=state,
+            zip_code=zip_code,
+            country=country
+        )
+
+        # Create one order per cart item (with correct quantity)
+        for item in cart_items:
+            Order.objects.create(
+                user=user,
+                product=item.product,
+                quantity=item.quantity,
+                amount=item.price,  # already quantity * price in your Cart model
+                status="Pending"
+            )
+
+        # Clear the cart after purchase
+        cart_items.delete()
+
+        return redirect('order_payment2')
+
+def order_payment2(req):
+    if 'username' in req.session:
+        user = User.objects.get(username=req.session['username'])
+        cart_items=Cart.objects.filter(user=user)
+
+
+        amount = 0
+        for cart in cart_items:
+            category = cart.product
+            quantity = cart.quantity
+            price = category.original_price * quantity
+            amount += price
+
+        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+        razorpay_order = client.order.create({
+            "amount": int(amount) * 100, 
+            "currency": "INR",
+            "payment_capture": "1"
+        })
+        order_id=razorpay_order['id']
+        order = Order.objects.create(
+            user=user,
+            price=amount,
+            provider_order_id=order_id
+        )
+        order.save()
+        print(order.pk)
+        req.session['order_id']=order.pk
+        return render(req, "user/checkout.html", {
+            "callback_url": "http://127.0.0.1:8000/callback2/",
+            "razorpay_key": settings.RAZORPAY_KEY_ID,
+            "order": order,
+        })
+    else:
+        return redirect('login') 
+
+@csrf_exempt
+def callback2(request):
+    def verify_signature(response_data):
+        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+        return client.utility.verify_payment_signature(response_data)
+
+    if "razorpay_signature" in request.POST:
+        payment_id = request.POST.get("razorpay_payment_id", "")
+        provider_order_id = request.POST.get("razorpay_order_id", "")
+        signature_id = request.POST.get("razorpay_signature", "")
+
+        # Update Buy model with payment details
+        order = Order.objects.get(provider_order_id=provider_order_id)
+        order.payment_id = payment_id
+        order.signature_id = signature_id
+        order.save()
+
+        if not verify_signature(request.POST):
+            order.status = PaymentStatus.SUCCESS
+            order.save()
+            return redirect("order_summary") 
+        else:
+            order.status = PaymentStatus.FAILURE
+            order.save()
+            return redirect("order_summary")
+
+    else:
+        payment_id = json.loads(request.POST.get("error[metadata]")).get("payment_id")
+        provider_order_id =json.loads(request.POST.get("error[metadata]")).get(
+            "order_id"
+        )
+        order = Order.objects.get(provider_order_id=provider_order_id)
+        # order.payment_id = payment_id
+        order.status = PaymentStatus.FAILURE
+        order.save()
+
+        return redirect("order_summary")
+
+
+def checkout_view(request):
+    user = request.user
+    cart_items = Cart.objects.filter(user=user)
+    total_price = sum(item.price for item in cart_items)
+
+    if request.method == 'POST':
+        address = request.POST.get('address')
+        city = request.POST.get('city')
+        state = request.POST.get('state')
+        zip_code = request.POST.get('zip_code')
+        country = request.POST.get('country')
+
+        # Save address
+        Address.objects.create(
+            user=user,
+            address=address,
+            city=city,
+            state=state,
+            zip_code=zip_code,
+            country=country
+        )
+
+        # Create one order per cart item (with correct quantity)
+        for item in cart_items:
+            Order.objects.create(
+                user=user,
+                product=item.product,
+                quantity=item.quantity,
+                amount=item.price,  # already quantity * price in your Cart model
+                status="Pending"
+            )
+
+        # Clear the cart after purchase
+        cart_items.delete()
+
+        return redirect('order_summary')
+
+    return render(request, 'user/checkout.html', {
+        'cart_items': cart_items,
+        'total_price': total_price
+    })
+
+def order_summary(request):
+    orders = Order.objects.filter(user=request.user)[::-1]
+
+    # Calculate the total price for each order
+    for order in orders:
+        order.total_price = order.product.price * order.quantity  # Add calculated total price
+
+    # Calculate the total amount for all orders
+    total_amount = sum(order.total_price for order in orders)
+
+    return render(request, 'user/order_summary.html', {'orders': orders, 'total_amount': total_amount})
+
+def update_quantity(request, item_id):
+    item = get_object_or_404(Cart, id=item_id)
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'increase' and item.quantity < 5:
+            item.quantity += 1
+        elif action == 'decrease' and item.quantity > 1:
+            item.quantity -= 1
+        item.save()
+
+    return redirect('cart')
 
 # Add to cart functionality
 def add_to_cart(request, product_id):
@@ -315,11 +544,21 @@ def view_wishlist(request):
 def account(request):
     return render(request, 'accounts/account.html')
 
-def address(request):
-    return render(request,'accounts/address.html')
+def add_address(request,id):
+    if request.method == 'POST':
+        form = AddressForm(request.POST)
+        if form.is_valid():
+            address = form.save(commit=False)
+            address.user = request.user  # Assign the address to the logged-in user
+            address.save()
+        return redirect('order_payment', id=id)
+    else:
+        form = AddressForm()
 
-def security(request):
-    return render(request,'accounts/security.html')
+    return render(request, 'user/add_address.html', {'form': form})
+
+# def address_success(request):
+#     return render(request, 'address/address_success.html')
 
 
 
@@ -334,7 +573,7 @@ def order_payment(request,id):
         user_data = User.objects.get(username=user)
         # print(user)
         product = Product.objects.get(pk=id)
-        amount = product.price
+        amount = product.discount
 
         client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
         razorpay_order = client.order.create(
@@ -409,3 +648,8 @@ def callback(request):
 
     return render(request, "callback.html", context={"status": order.status}) 
     # or return redirect(function name of callback giving html page)
+
+
+
+
+    

@@ -195,75 +195,57 @@ $(document).ready(function () {
               </div>
               <div class="card-body">
                 <form method="POST" enctype="multipart/form-data">
-                  {% csrf_token %}
-                  <div class="mb-3">
-                    <label for="pro_id" class="form-label">Product ID</label>
-                    <input type="text" class="form-control" id="pro_id" name="pro_id" required>
-                  </div>
-                  <div class="mb-3">
-                    <label for="name" class="form-label">Name</label>
-                    <input type="text" class="form-control" id="name" name="name" required>
-                  </div>
-                  <div class="mb-3">
-                    <label for="img" class="form-label">Image</label>
-                    <input type="file" class="form-control" id="img" name="img" accept="image/*" required onchange="previewImage(event)">
-                </div>
-                
-                <!-- New Image Preview (Hidden Initially) -->
-                <div class="mb-3 text-center d-none" id="new-image-container">
-                    <p class="fw-bold">New Image Preview:</p>
-                    <img id="new-img-preview" src="#" alt="New Image" class="img-preview img-fluid rounded shadow-sm" style="width: 200px; height: 250px;">
-                </div>
-                
-                <!-- JavaScript for Image Preview -->
-                <script>
-                function previewImage(event) {
-                    const newImage = document.getElementById('new-img-preview');
-                    const newImageContainer = document.getElementById('new-image-container');
-                    const file = event.target.files[0];
-                
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            newImage.src = e.target.result;
-                            newImageContainer.classList.remove('d-none'); // Show the new image preview
-                        };
-                        reader.readAsDataURL(file);
-                    } else {
-                        newImageContainer.classList.add('d-none'); // Hide the preview if no file is selected
-                    }
-                }
-                </script>
-                
-                  <div class="mb-3">
-                    <label for="description" class="form-label">Description</label>
-                    <textarea class="form-control" id="description" name="description" rows="3"></textarea>
-                  </div>
-                  <div class="mb-3">
-                    <label for="highlights" class="form-label">Highlights</label>
-                    <textarea class="form-control" id="highlights" name="highlights" rows="2"></textarea>
-                  </div>
-                  <div class="mb-3">
-                    <label class="form-label">Categories:</label>
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" name="protien" id="protien">
-                      <label class="form-check-label" for="protien">Protien</label>
+                    {% csrf_token %}
+                  
+                    <div class="mb-3">
+                      <label for="title" class="form-label">Title</label>
+                      <input type="text" class="form-control" id="title" name="title" required>
                     </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" name="muscle building" id="muscle building">
-                      <label class="form-check-label" for="muscle building">muscle building</label>
+                  
+                    <div class="mb-3">
+                      <label for="description" class="form-label">Description</label>
+                      <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
                     </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" name="weight loss" id="weight loss">
-                      <label class="form-check-label" for="weight loss">weight loss</label>
+                  
+                    <div class="mb-3">
+                      <label for="price" class="form-label">Price</label>
+                      <input type="number" step="0.01" class="form-control" id="price" name="price" required>
                     </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" name="pre workout" id="pre workout">
-                      <label class="form-check-label" for="pre workout">pre workout</label>
+                  
+                    {% for i in "12345" %}
+                    <div class="mb-3">
+                      <label for="image{{ i }}" class="form-label">Image {{ i }}</label>
+                      <input type="file" class="form-control" name="image{{ i }}" accept="image/*">
                     </div>
-                  </div>
-                  <button type="submit" class="btn btn-primary w-100">Next</button>
-                </form>
+                    {% endfor %}
+                  
+                    <div class="mb-3">
+                      <label for="category" class="form-label">Category</label>
+                      <select class="form-control" name="category" id="category">
+                        {% for cat in categories %}
+                          <option value="{{ cat.id }}">{{ cat.name }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  
+                    <div class="mb-3">
+                      <label for="original_price" class="form-label">Original Price</label>
+                      <input type="number" step="0.01" class="form-control" name="original_price" required>
+                    </div>
+                  
+                    <div class="mb-3">
+                      <label for="discount" class="form-label">Discount (%)</label>
+                      <input type="number" class="form-control" name="discount" value="0" required>
+                    </div>
+                  
+                    <div class="mb-3">
+                      <label for="delivery_date" class="form-label">Delivery Date</label>
+                      <input type="date" class="form-control" name="delivery_date" required>
+                    </div>
+                  
+                    <button type="submit" class="btn btn-success w-100">Add Product</button>
+                  </form>
+                  
               </div>
             </div>
           </div>

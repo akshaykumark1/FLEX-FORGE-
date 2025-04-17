@@ -38,45 +38,23 @@
 </head>
 <body>
     <div class="container mt-4">
-        <h1 class="mb-4 text-white">Your Account</h1>
+        <h1 class="mb-4 text-white"> Account</h1>
         <div class="row g-3">
             <div class="col-md-4 col-sm-6">
                 <div class="card">
-                    <a href=""><h2>Your Orders</h2> </a>
+                    <a href="{% url 'order_summary' %}"><h2>My Orders</h2> </a>
                     <p>Track, return, or buy things again</p>
                 </div>
             </div>
-            <div class="col-md-4 col-sm-6">
-                <div class="card">
-                   <a href="{% url 'security' %}"> <h2>Login & security</h2></a>
-                    <p>Edit login, name, and mobile number</p>
-                </div>
-            </div>
-            <div class="col-md-4 col-sm-6">
-                <div class="card">
-                    <h2>Prime</h2>
-                    <p>View benefits and payment settings</p>
-                </div>
-            </div>
+          
             <div class="col-md-4 col-sm-6">
                 <div class="card">
                     <a href="{% url 'address' %}"><h2>Your Addresses</h2></a>
                     <p>Edit addresses for orders and gifts</p>
                 </div>
             </div>
-            <div class="col-md-4 col-sm-6">
-                <div class="card">
-                    <h2>Your business account</h2>
-                    <p>Sign up for free to save up to 28% with GST invoice and bulk discounts</p>
-                </div>
-            </div>
-            <div class="col-md-4 col-sm-6">
-                <div class="card">
-                    <h2>Payment options</h2>
-                    <p>Edit or add payment methods</p>
-                </div>
-            </div>
            
+          
             <div class="col-md-4 col-sm-6">
                 <div class="card">
                     <h2>Contact Us</h2>

@@ -104,12 +104,31 @@ def order(request):
     return render(request, 'admin/orders.html', {'orders': orders})
 
 def users(request):
-    users = User.objects.all()
+    users = User.objects.filter(user=request.user)
     return render(request, 'admin/users.html', {'users': users})
 
 def address(request):
-    addresses = Address.objects.all()
-    return render(request, 'admin/address.html', {'addresses': addresses})
+    addresses = Address.objects.filter(user=request.user)
+    return render(request, 'user/address.html', {'addresses': addresses})
+
+def edit_address(request, pk):
+    address = get_object_or_404(Address, pk=pk)
+    if request.method == 'POST':
+        form = AddressForm(request.POST, instance=address)
+        if form.is_valid():
+            form.save()
+            return redirect('address')  # Change to your address list view name
+    else:
+        form = AddressForm(instance=address)
+    return render(request, 'user/edit_address.html', {'form': form})
+
+def delete_address(request, pk):
+    address = get_object_or_404(Address, pk=pk)
+    address.delete()
+    return redirect('address') 
+
+
+
 
 
 def admin(request):

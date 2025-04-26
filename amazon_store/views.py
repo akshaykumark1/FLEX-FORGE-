@@ -302,80 +302,6 @@ def checkout_view(request):
 
         return redirect('order_payment2')
 
-def order_payment2(req):
-    if 'username' in req.session:
-        user = User.objects.get(username=req.session['username'])
-        cart_items=Cart.objects.filter(user=user)
-
-
-        amount = 0
-        for cart in cart_items:
-            category = cart.product
-            quantity = cart.quantity
-            price = category.original_price * quantity
-            amount += price
-
-        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
-        razorpay_order = client.order.create({
-            "amount": int(amount) * 100, 
-            "currency": "INR",
-            "payment_capture": "1"
-        })
-        order_id=razorpay_order['id']
-        order = Order.objects.create(
-            user=user,
-            price=amount,
-            provider_order_id=order_id
-        )
-        order.save()
-        print(order.pk)
-        req.session['order_id']=order.pk
-        return render(req, "user/checkout.html", {
-            "callback_url": "http://127.0.0.1:8000/callback2/",
-            "razorpay_key": settings.RAZORPAY_KEY_ID,
-            "order": order,
-        })
-    else:
-        return redirect('login') 
-
-@csrf_exempt
-def callback2(request):
-    def verify_signature(response_data):
-        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
-        return client.utility.verify_payment_signature(response_data)
-
-    if "razorpay_signature" in request.POST:
-        payment_id = request.POST.get("razorpay_payment_id", "")
-        provider_order_id = request.POST.get("razorpay_order_id", "")
-        signature_id = request.POST.get("razorpay_signature", "")
-
-        # Update Buy model with payment details
-        order = Order.objects.get(provider_order_id=provider_order_id)
-        order.payment_id = payment_id
-        order.signature_id = signature_id
-        order.save()
-
-        if not verify_signature(request.POST):
-            order.status = PaymentStatus.SUCCESS
-            order.save()
-            return redirect("order_summary") 
-        else:
-            order.status = PaymentStatus.FAILURE
-            order.save()
-            return redirect("order_summary")
-
-    else:
-        payment_id = json.loads(request.POST.get("error[metadata]")).get("payment_id")
-        provider_order_id =json.loads(request.POST.get("error[metadata]")).get(
-            "order_id"
-        )
-        order = Order.objects.get(provider_order_id=provider_order_id)
-        # order.payment_id = payment_id
-        order.status = PaymentStatus.FAILURE
-        order.save()
-
-        return redirect("order_summary")
-
 
 def checkout_view(request):
     user = request.user
@@ -629,9 +555,101 @@ def order_payment(request,id):
 
 
 
+
 @csrf_exempt
 def callback(request):
+    def verify_signature(response_data):
+        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+        return client.utility.verify_payment_signature(response_data)
 
+    if request.method == "POST":
+        if "razorpay_signature" in request.POST:
+            payment_id = request.POST.get("razorpay_payment_id", "")
+            provider_order_id = request.POST.get("razorpay_order_id", "")
+            signature_id = request.POST.get("razorpay_signature", "")
+
+            order = Order.objects.get(provider_order_id=provider_order_id)
+            order.payment_id = payment_id
+            order.signature_id = signature_id
+            order.save()
+
+            try:
+                verify_signature({
+                    "razorpay_order_id": provider_order_id,
+                    "razorpay_payment_id": payment_id,
+                    "razorpay_signature": signature_id,
+                })
+                order.status = PaymentStatus.SUCCESS
+            except razorpay.errors.SignatureVerificationError:
+                order.status = PaymentStatus.FAILURE
+
+            order.save()
+            return render(request, "callback.html", context={"status": order.status})
+
+        else:
+            try:
+                error_metadata = json.loads(request.POST.get("error[metadata]", "{}"))
+                payment_id = error_metadata.get("payment_id", "")
+                provider_order_id = error_metadata.get("order_id", "")
+
+                order = Order.objects.get(provider_order_id=provider_order_id)
+                order.payment_id = payment_id
+                order.status = PaymentStatus.FAILURE
+                order.save()
+            except Exception as e:
+                print("Error parsing failed payment:", e)
+
+            return render(request, "callback.html", context={"status": "failure"})
+
+    return render(request, "callback.html", context={"status": "invalid_request"})
+
+
+
+
+
+
+@csrf_exempt
+def order_payment2(req):
+    if 'username' in req.session:
+        user = User.objects.get(username=req.session['username'])
+        cart_items = Cart.objects.filter(user=user)
+
+        amount = 0
+        for cart in cart_items:
+            amount += cart.product.original_price * cart.quantity
+
+        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+        razorpay_order = client.order.create({
+            "amount": int(amount) * 100,  # in paise
+            "currency": "INR",
+            "payment_capture": "1"
+        })
+        order_id = razorpay_order['id']
+
+        for cart in cart_items:
+            Order.objects.create(
+                user=user,
+                product=cart.product,
+                quantity=cart.quantity,
+                amount=cart.product.original_price * cart.quantity,
+                provider_order_id=order_id
+            )
+
+        req.session['order_id'] = order_id
+
+        return render(req, "user/checkout.html", {
+            "callback_url": "http://127.0.0.1:8000/callback2/",
+            "razorpay_key": settings.RAZORPAY_KEY_ID,
+            "order_id": order_id,
+            "amount": amount,
+            "cart_items": cart_items,      # <-- send cart items
+            "total_price": amount          # <-- send total price
+        })
+    else:
+        return redirect('login')
+
+@csrf_exempt
+def callback2(request):
     def verify_signature(response_data):
         client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
         return client.utility.verify_payment_signature(response_data)
@@ -641,34 +659,23 @@ def callback(request):
         provider_order_id = request.POST.get("razorpay_order_id", "")
         signature_id = request.POST.get("razorpay_signature", "")
 
-        order = Order.objects.get(provider_order_id=provider_order_id)
+        order = Order.objects.filter(provider_order_id=provider_order_id).first()
         order.payment_id = payment_id
         order.signature_id = signature_id
-        order.save()
 
         if verify_signature(request.POST):
             order.status = PaymentStatus.SUCCESS
-            order.save()
-            return render(request, "callback.html", context={"status": order.status}) 
-            # or return redirect(function name of callback giving html page)
         else:
             order.status = PaymentStatus.FAILURE
-            order.save()
-            return render(request, "callback.html", context={"status": order.status}) 
-            # or return redirect(function name of callback giving html page)
+
+        order.save()
+        return redirect("order_summary") 
+
     else:
-     payment_id = json.loads(request.POST.get("error[metadata]")).get("payment_id")
-     provider_order_id = json.loads(request.POST.get("error[metadata]")).get("order_id")
+        error_data = json.loads(request.POST.get("error[metadata]"))
+        provider_order_id = error_data.get("order_id")
+        order = Order.objects.filter(provider_order_id=provider_order_id).first()
+        order.status = PaymentStatus.FAILURE
+        order.save()
 
-     order = Order.objects.get(provider_order_id=provider_order_id)
-     order.payment_id = payment_id
-     order.status = PaymentStatus.FAILURE
-     order.save()
-
-    return render(request, "callback.html", context={"status": order.status}) 
-    # or return redirect(function name of callback giving html page)
-
-
-
-
-    
+        return redirect("order_summary")

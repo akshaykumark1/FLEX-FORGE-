@@ -89,24 +89,22 @@
             <div class="col-12">
                 <div class="card p-4 text-center">
                     <h2 class="section-title">Secure Payment</h2>
-                    <form method="POST">
+                    <form method="POST" action="{{ callback_url }}">
                         {% csrf_token %}
                         <script src="https://checkout.razorpay.com/v1/checkout.js"
                             data-key="{{ razorpay_key }}"
-                            data-amount="{{ order.amount }}"
+                            data-amount="{{ amount|floatformat:0 }}"
                             data-currency="INR"
-                            data-name="{{ order.name }}"
-                            data-description="Test Transaction"
-                            data-image="https://example.com/your_logo"
-                            data-order_id="{{ order.provider_order_id }}"
-                            data-prefill.name="Gaurav Kumar"
-                            data-prefill.email="gaurav.kumar@example.com"
-                            data-prefill.contact="9999999999"
-                            data-notes.address="Razorpay Corporate Office"
+                            data-order_id="{{ order_id }}"
+                            data-buttontext="Pay Now"
+                            data-name="FLEX FORGE"
+                            data-description="Payment"
+                            data-image="https://example.com/logo.png"
                             data-theme.color="#0d6efd">
                         </script>
                         <input type="hidden" custom="Hidden Element" name="hidden">
                     </form>
+                    
                 </div>
             </div>
         </div>

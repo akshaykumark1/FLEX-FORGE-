@@ -94,7 +94,7 @@
                             <td>{{ order.amount }}</td>
                             <td>{{ order.provider_order_id }}</td>
                             <td>
-                                <a href="#" class="btn btn-danger btn-sm">Cancel</a>
+                                <a href="{% url 'cancel_order' order.id %}" class="btn btn-danger btn-sm">Cancel</a>
                             </td>
                         </tr>
                         {% endfor %}

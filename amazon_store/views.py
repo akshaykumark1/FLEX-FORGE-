@@ -513,54 +513,55 @@ def add_address(request,id):
 def index(request):
     return render(request, "index.html")
 
-def order_payment(request,id):
-        user=request.user
-        user_data = User.objects.get(username=user)
-        # print(user)
-        product = Product.objects.get(pk=id)
-        amount = product.discount
+# Order payment view
+def order_payment(request, id):
+    user = request.user
+    user_data = User.objects.get(username=user)
+    product = Product.objects.get(pk=id)
+    amount = product.discount  # Assuming discount is the correct amount to be charged
 
-        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
-        razorpay_order = client.order.create(
-            {"amount": int(amount) * 100, "currency": "INR", "payment_capture": "1"}
-        )
+    # Initialize Razorpay client
+    client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
-        order_id = razorpay_order['id']
+    # Create Razorpay order
+    razorpay_order = client.order.create(
+        {"amount": int(amount) * 100, "currency": "INR", "payment_capture": "1"}
+    )
 
-        # cart=Cart.objects.filter(user=user_data)
-        # for i in cart:        
-        #     order = Order.objects.create(
-        #         user=user_data, amount=amount, provider_order_id=order_id,product=product,quantity=1
-        #     )
-        #     order.save()
+    order_id = razorpay_order['id']
 
+    # Create order record in the database
+    order = Order.objects.create(
+        user=user_data, amount=amount, provider_order_id=order_id, product=product, quantity=1
+    )
+    order.save()
 
-        order = Order.objects.create(
-            user=user_data, amount=amount, provider_order_id=order_id,product=product,quantity=1
-        )
-        order.save()
+    # Update the callback URL with the public domain or ngrok URL
+    callback_url = "http://yourdomain.com/razorpay/callback"  # Change this to your domain or ngrok URL
+    if settings.DEBUG:  # Use ngrok URL during local testing
+        callback_url = "http://<ngrok_subdomain>.ngrok.io/razorpay/callback"
 
-        return render(
-            request,
-            "user/payment.html",
-            {
-                "callback_url": "http://" + "127.0.0.1:8000" + "razorpay/callback",
-                "razorpay_key": settings.RAZORPAY_KEY_ID,
-                "order": order,
-
-            },
-        )
-
-
+    return render(
+        request,
+        "user/payment.html",
+        {
+            "callback_url": callback_url,
+            "razorpay_key": settings.RAZORPAY_KEY_ID,
+            "order": order,
+        },
+    )
 
 
-
-
+# Callback view for payment status
 @csrf_exempt
 def callback(request):
     def verify_signature(response_data):
         client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
-        return client.utility.verify_payment_signature(response_data)
+        try:
+            client.utility.verify_payment_signature(response_data)
+            return True
+        except razorpay.errors.SignatureVerificationError:
+            return False
 
     if request.method == "POST":
         if "razorpay_signature" in request.POST:
@@ -571,40 +572,28 @@ def callback(request):
             order = Order.objects.get(provider_order_id=provider_order_id)
             order.payment_id = payment_id
             order.signature_id = signature_id
-            order.save()
 
-            try:
-                verify_signature({
-                    "razorpay_order_id": provider_order_id,
-                    "razorpay_payment_id": payment_id,
-                    "razorpay_signature": signature_id,
-                })
+            # Verify the payment signature
+            response_data = {
+                "razorpay_order_id": provider_order_id,
+                "razorpay_payment_id": payment_id,
+                "razorpay_signature": signature_id,
+            }
+
+            if verify_signature(response_data):
                 order.status = PaymentStatus.SUCCESS
-            except razorpay.errors.SignatureVerificationError:
+            else:
                 order.status = PaymentStatus.FAILURE
+                print("Signature verification failed")
 
             order.save()
             return render(request, "callback.html", context={"status": order.status})
 
         else:
-            try:
-                error_metadata = json.loads(request.POST.get("error[metadata]", "{}"))
-                payment_id = error_metadata.get("payment_id", "")
-                provider_order_id = error_metadata.get("order_id", "")
-
-                order = Order.objects.get(provider_order_id=provider_order_id)
-                order.payment_id = payment_id
-                order.status = PaymentStatus.FAILURE
-                order.save()
-            except Exception as e:
-                print("Error parsing failed payment:", e)
-
+            print("Error in callback: Missing Razorpay signature.")
             return render(request, "callback.html", context={"status": "failure"})
 
     return render(request, "callback.html", context={"status": "invalid_request"})
-
-
-
 
 
 

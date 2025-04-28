@@ -51,9 +51,8 @@ urlpatterns = [
     
 # payments
     path('index',views.index,name='index'),
-    path('order_payment/<id>',views.order_payment,name='order_payment'),
-    path('callback/<id>',views.callback,name='callback'),
-
+    path('order_payment/<int:id>', views.order_payment, name='order_payment'),
+    path('razorpay/callback', views.callback, name='callback'),
     path('order_payment2',views.order_payment2,name='order_payment2'),
     path('callback2',views.callback2,name='callback2'),
     path('add_address/<id>/', views.add_address, name='add_address'),

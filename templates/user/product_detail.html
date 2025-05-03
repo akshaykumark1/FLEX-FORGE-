@@ -127,12 +127,16 @@
         </ul>
 
         <div class="d-flex align-items-center">
-          <form class="d-flex me-3">
-            <input class="form-control me-2" type="search" placeholder="Search">
+          <form class="d-flex" role="search" action="{% url 'search' %}" method="POST">
+            {% csrf_token %}
+
+            <input id="search" 
+                class="form-control  me-2" type="text" placeholder="Search For Product, Brand and More"
+                aria-label="Search" name="searched">
             <button class="btn btn-outline-dark" type="submit">
-              <i class="fas fa-search"></i>
+                <i class="fa-solid fa-magnifying-glass"></i>
             </button>
-          </form>
+        </form>
 
           {% if user.is_authenticated %}
             <a href="{% url 'account' %}" class="nav-link me-2"><i class="fas fa-user"></i></a>
@@ -212,9 +216,12 @@
       <div class="col-md-6">
         <h2 class="text-white fw-bold">STAY INFORMED<br>WITH FLEX FORGE</h2>
       </div>
+      {%  if not user.is_authenticated %}
       <div class="col-md-6 d-flex align-items-center justify-content-md-end justify-content-start mt-3 mt-md-0">
-        <a href="{% url 'signup' %}" class="btn btn-dark px-4 py-3 fw-bold">SIGN UP NOW</a>
+          <a href="{% url 'signup' %}" class="btn btn-dark px-4 py-3 fw-bold">SIGN UP NOW</a>
       </div>
+  </div>
+  {%  endif %}
     </div>
 
     <div class="py-5"></div>

@@ -65,32 +65,29 @@
         <header>
             <nav class="navbar navbar-expand-lg navbar-light bg-light">
                 <div class="container">
-                    <a class="navbar-brand" href="{% url 'home' %}">FLEX FORGE</a>
+                    <a class="navbar-brand me-4" href="{% url 'home' %}">FLEX FORGE</a>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </button>
                     <div class="collapse navbar-collapse" id="navbarNav">
                         <ul class="navbar-nav mx-auto text-center">
-                            <li class="nav-item">
+                            <li class="nav-item me-4">
                                 <a class="nav-link active" href="{% url 'product_buy' %}">PRODUCTS</a>
                             </li>
-                            <li class="nav-item">
+                            <li class="nav-item me-4">
                                 <a class="nav-link" href="{% url 'wheretobuy' %}">WHERE TO BUY</a>
                             </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">MORE</a>
-                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <li><a class="dropdown-item" href="#">Blog</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="{% url 'help' %}">Contact</a></li>
-                                </ul>
-                            </li>
+                            
                         </ul>
         
                         <!-- Right section with Search Bar, User, Logout, and Cart -->
                         <div class="d-flex align-items-center">
-                            <form class="d-flex me-3">
-                                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                            <form class="d-flex" role="search" action="{% url 'search' %}" method="POST">
+                                {% csrf_token %}
+    
+                                <input id="search" 
+                                    class="form-control  me-2" type="text" placeholder="Search For Product, Brand and More"
+                                    aria-label="Search" name="searched">
                                 <button class="btn btn-outline-dark" type="submit">
                                     <i class="fa-solid fa-magnifying-glass"></i>
                                 </button>
@@ -98,13 +95,13 @@
                             
                             {% if user.is_authenticated %}
                             <!-- Show user/account/logout/cart links -->
-                            <a href="{% url 'account' %}" class="nav-link me-2">
+                            <a href="{% url 'account' %}" class="nav-link me-4">
                               <i class="fa-solid fa-user"></i>
                             </a>
-                            <a href="{% url 'userlogout' %}" class="nav-link me-2">
+                            <a href="{% url 'userlogout' %}" class="nav-link me-4">
                               <i class="fa-solid fa-right-from-bracket"></i>
                             </a>
-                            <a href="{% url 'cart' %}" class="nav-link">
+                            <a href="{% url 'cart' %}" class="nav-link me-4">
                               <img src="{% static 'images/cart.png' %}" alt="Cart" width="30" height="24">
                             </a>
                         
@@ -138,10 +135,12 @@
             <div class="col-md-6">
                 <h2 class="text-white fw-bold">STAY INFORMED<br>WITH FLEX FORGE</h2>
             </div>
+            {%  if not user.is_authenticated %}
             <div class="col-md-6 d-flex align-items-center justify-content-md-end justify-content-start mt-3 mt-md-0">
                 <a href="{% url 'signup' %}" class="btn btn-dark px-4 py-3 fw-bold">SIGN UP NOW</a>
             </div>
         </div>
+        {%  endif %}
         
         <!-- White space separator -->
         <div class="py-5"></div>
@@ -150,7 +149,7 @@
         <div class="row mt-5">
             <!-- Logo Column -->
             <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
-                <img src="{% static 'images/stlogo.webp' %}" class="img-fluid mb-4" alt="MuscleTech Seal of Authenticity">
+                <img src="{% static 'images/log.png' %}" class="img-fluid mb-4" alt="MuscleTech Seal of Authenticity">
                 
                 <!-- Social Media Icons -->
                 <div class="d-flex mt-3">
@@ -222,7 +221,7 @@
 <!-- CSS for the purple top section -->
 <style>
     footer {
-        background-color: white;
+        background-color: rgb(255, 255, 255);
     }
     
     footer .row:first-child {

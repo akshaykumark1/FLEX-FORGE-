@@ -510,8 +510,7 @@ def add_address(request,id):
 
 # payment section
 
-def index(request):
-    return render(request, "index.html")
+
 
 # Order payment view
 def order_payment(request, id):
@@ -654,11 +653,13 @@ def callback2(request):
 
         if verify_signature(request.POST):
             order.status = PaymentStatus.SUCCESS
+            order.save()
+            return redirect("home")  # Redirect to home page on success
         else:
             order.status = PaymentStatus.FAILURE
 
         order.save()
-        return redirect("order_summary") 
+        return redirect("order_summary")
 
     else:
         error_data = json.loads(request.POST.get("error[metadata]"))
@@ -668,3 +669,4 @@ def callback2(request):
         order.save()
 
         return redirect("order_summary")
+

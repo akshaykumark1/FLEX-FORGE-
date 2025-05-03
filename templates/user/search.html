@@ -309,36 +309,21 @@
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <form class="d-flex" role="search" action="{% url 'search' %}" method="POST">
                         {% csrf_token %}
-                        <!-- <select name="category" class="styled-select">
-                            <option value="">All Categories</option>
-                            <option value="phone" {% if category == 'protien' %}selected{% endif %}>Phone</option>
-                            <option value="dress" {% if category == 'dress' %}selected{% endif %}>Dress</option>
-                            <option value="laptop" {% if category == 'laptop' %}selected{% endif %}>Laptop</option>
-                            <option value="others" {% if category == 'others' %}selected{% endif %}>Others</option>
-                        </select> -->
+                       
                         <input id="search" data-aos="fade-down" data-aos-duration="1500" data-aos-delay="200"
                             class="form-control me-2" type="text" placeholder="Search For Product, Brand and More"
                             aria-label="Search" name="searched">
                     </form>
                   
-                    <li class="nav-item">
-                        <a class="nav-link" data-aos="fade-down" data-aos-duration="1500" data-aos-delay="400"
-                            href="../cart_disp">Cart</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-aos="fade-down" data-aos-duration="1500" data-aos-delay="500"
-                            href="../user_vew_booking">Bookings</a>
-                    </li>
+                   
+                  
                 </ul>
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item dropdown profile-menu">
                         <a class="nav-link" id="profile-icon" data-aos="fade-down" data-aos-duration="1500" data-aos-delay="300">
                             <i class="fa-solid fa-user-circle fa-lg"></i>
                         </a>
-                        <div class="dropdown-menu profile-dropdown">
-                            <a class="dropdown-item text-center" href="../profile_view">Profile</a>
-                           
-                            <a class="dropdown-item text-center" href="../logout">Logout</a>
+                        
                         </div>
                     </li>
                 </ul>

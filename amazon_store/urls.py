@@ -50,7 +50,6 @@ urlpatterns = [
     path('remove-from-wishlist/<int:product_id>/',views.remove_from_wishlist, name='remove_from_wishlist'),
     
 # payments
-    path('index',views.index,name='index'),
     path('order_payment/<int:id>', views.order_payment, name='order_payment'),
     path('razorpay/callback', views.callback, name='callback'),
     path('order_payment2',views.order_payment2,name='order_payment2'),

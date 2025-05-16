@@ -47,6 +47,19 @@
             font-size: 1.2rem;
             color: #888;
         }
+
+        .cancel-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .cancel-btn:hover {
+            background-color: #c82333;
+        }
     </style>
 </head>
 <body>
@@ -69,6 +82,13 @@
 
                             <p><strong>Price:</strong> ₹{{ order.total_price }}</p>
                             <p class="order-status">Status: {{ order.status }}</p>
+
+                            {% if order.status != 'Cancelled' %}
+                                <!-- Cancel Order Button -->
+                                <a href="{% url 'cancel_order' order.id %}">
+                                    <button class="cancel-btn">Cancel Order</button>
+                                </a>
+                            {% endif %}
                         </div>
                     </div>
                 {% endfor %}

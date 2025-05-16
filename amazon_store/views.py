@@ -508,7 +508,6 @@ def add_address(request,id):
 
 
 
-# payment section
 
 
 
@@ -535,11 +534,8 @@ def order_payment(request, id):
     )
     order.save()
 
-    # Update the callback URL with the public domain or ngrok URL
-    callback_url = "http://yourdomain.com/razorpay/callback"  # Change this to your domain or ngrok URL
-    if settings.DEBUG:  # Use ngrok URL during local testing
-        callback_url = "http://<ngrok_subdomain>.ngrok.io/razorpay/callback"
-
+    callback_url = "http://127.0.0.1:8000/razorpay/callback"  
+ 
     return render(
         request,
         "user/payment.html",
@@ -581,92 +577,128 @@ def callback(request):
 
             if verify_signature(response_data):
                 order.status = PaymentStatus.SUCCESS
+                return render (request,"base.html")
             else:
                 order.status = PaymentStatus.FAILURE
                 print("Signature verification failed")
 
             order.save()
-            return render(request, "callback.html", context={"status": order.status})
+            return render(request, "base.html", context={"status": order.status})
 
         else:
             print("Error in callback: Missing Razorpay signature.")
-            return render(request, "callback.html", context={"status": "failure"})
+            return render(request, "checkout.html", context={"status": "failure"})
 
-    return render(request, "callback.html", context={"status": "invalid_request"})
+    return render(request, "base.html", context={"status": "invalid_request"})
 
 
+def order_payment2(request):
+    user = request.user
+    user_data = User.objects.get(username=user)
+    
+    # Fetch all cart items for the user
+    cart_items = Cart.objects.filter(user=user)
+    
+    # Calculate total amount for all cart items
+    amount = sum(item.price for item in cart_items)  # Assuming price is already calculated
 
-@csrf_exempt
-def order_payment2(req):
-    if 'username' in req.session:
-        user = User.objects.get(username=req.session['username'])
-        cart_items = Cart.objects.filter(user=user)
+    # Initialize Razorpay client
+    client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
-        amount = 0
-        for cart in cart_items:
-            amount += cart.product.original_price * cart.quantity
+    # Create Razorpay order
+    razorpay_order = client.order.create(
+        {"amount": int(amount) * 100, "currency": "INR", "payment_capture": "1"}  # amount in paise
+    )
 
-        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
-        razorpay_order = client.order.create({
-            "amount": int(amount) * 100,  # in paise
-            "currency": "INR",
-            "payment_capture": "1"
-        })
-        order_id = razorpay_order['id']
+    order_id = razorpay_order['id']
 
-        for cart in cart_items:
-            Order.objects.create(
-                user=user,
-                product=cart.product,
-                quantity=cart.quantity,
-                amount=cart.product.original_price * cart.quantity,
-                provider_order_id=order_id
-            )
+    # Create order record in the database for each cart item
+    for cart_item in cart_items:
+        Order.objects.create(
+            user=user_data,
+            amount=cart_item.price,
+            provider_order_id=order_id,
+            product=cart_item.product,
+            quantity=cart_item.quantity
+        )
 
-        req.session['order_id'] = order_id
+    # Store the order ID in the session or database if needed
+    request.session['order_id'] = order_id
 
-        return render(req, "user/checkout.html", {
-            "callback_url": "http://127.0.0.1:8000/callback2/",
-            "razorpay_key": settings.RAZORPAY_KEY_ID,
-            "order_id": order_id,
-            "amount": amount,
-            "cart_items": cart_items,      # <-- send cart items
-            "total_price": amount          # <-- send total price
-        })
-    else:
-        return redirect('login')
+    # Razorpay callback URL (adjust this for your production URL)
+    callback_url = "http://127.0.0.1:8000/razorpay/callback2"  
+    
+    return render(
+        request,
+        "user/payment2.html",
+        {
+            "callback_url": callback_url,  # Razorpay callback URL
+            "razorpay_key": settings.RAZORPAY_KEY_ID,  # Razorpay key
+            "order_id": order_id,  # Razorpay order ID
+            "cart_items": cart_items,  # Cart items in the cart
+            "total_amount": amount,  # Total amount for the cart (in INR)
+            "user_data": user_data,  # User data to prefill form
+        }
+    )
 
 @csrf_exempt
 def callback2(request):
     def verify_signature(response_data):
         client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
-        return client.utility.verify_payment_signature(response_data)
+        try:
+            return client.utility.verify_payment_signature(response_data)
+        except razorpay.errors.SignatureVerificationError:
+            return False
 
-    if "razorpay_signature" in request.POST:
-        payment_id = request.POST.get("razorpay_payment_id", "")
-        provider_order_id = request.POST.get("razorpay_order_id", "")
-        signature_id = request.POST.get("razorpay_signature", "")
+    if request.method == "POST":
+        if "razorpay_signature" in request.POST:
+            payment_id = request.POST.get("razorpay_payment_id", "")
+            provider_order_id = request.POST.get("razorpay_order_id", "")
+            signature_id = request.POST.get("razorpay_signature", "")
 
-        order = Order.objects.filter(provider_order_id=provider_order_id).first()
-        order.payment_id = payment_id
-        order.signature_id = signature_id
+            # Using filter instead of get to avoid MultipleObjectsReturned error
+            orders = Order.objects.filter(provider_order_id=provider_order_id)
+            if orders.exists():
+                # If multiple orders exist, we'll process them one by one (or handle your specific case)
+                for order in orders:
+                    order.payment_id = payment_id
+                    order.signature_id = signature_id
 
-        if verify_signature(request.POST):
-            order.status = PaymentStatus.SUCCESS
-            order.save()
-            return redirect("home")  # Redirect to home page on success
-        else:
-            order.status = PaymentStatus.FAILURE
+                    if verify_signature(request.POST):
+                        order.status = PaymentStatus.SUCCESS
+                    else:
+                        order.status = PaymentStatus.FAILURE
+                    
+                    order.save()
 
-        order.save()
-        return redirect("order_summary")
+                return redirect("home")  # Redirect to home page on success
+            else:
+                return redirect("order_summary")  # Handle the case where no order is found
 
-    else:
-        error_data = json.loads(request.POST.get("error[metadata]"))
-        provider_order_id = error_data.get("order_id")
-        order = Order.objects.filter(provider_order_id=provider_order_id).first()
-        order.status = PaymentStatus.FAILURE
-        order.save()
+        elif "error[metadata]" in request.POST:
+            try:
+                error_data = json.loads(request.POST.get("error[metadata]"))
+                provider_order_id = error_data.get("order_id")
+                orders = Order.objects.filter(provider_order_id=provider_order_id)
+                for order in orders:
+                    order.status = PaymentStatus.FAILURE
+                    order.save()
+            except Exception as e:
+                # Optional: log exception
+                pass
 
-        return redirect("order_summary")
+            return redirect("order_summary")
 
+    return render(request, "home.html")
+
+@login_required
+def cancel_order(request, order_id):
+    # Fetch the order object
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+
+    # Update the order status to 'Cancelled'
+    order.status = 'Cancelled'
+    order.save()
+
+    # Redirect the user to the order summary or home page
+    return redirect('order_summary')

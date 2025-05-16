@@ -53,7 +53,7 @@ urlpatterns = [
     path('order_payment/<int:id>', views.order_payment, name='order_payment'),
     path('razorpay/callback', views.callback, name='callback'),
     path('order_payment2',views.order_payment2,name='order_payment2'),
-    path('callback2',views.callback2,name='callback2'),
+    path('razorpay/callback2',views.callback2,name='callback2'),
     path('add_address/<id>/', views.add_address, name='add_address'),
 
     path('checkout/', views.checkout_view, name='checkout'),
@@ -65,6 +65,7 @@ urlpatterns = [
 
     path('address/edit/<int:pk>/', views.edit_address, name='edit_address'),
     path('address/delete/<int:pk>/', views.delete_address, name='delete_address'),
+     path('order/cancel/<int:order_id>/', views.cancel_order, name='cancel_order'),
 
 
 
